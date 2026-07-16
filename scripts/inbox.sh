@@ -19,12 +19,13 @@ fi
 
 set +e
 sel="$(eval "$list_cmd" | fzf \
-  --delimiter='\t' --with-nth=2,3,4 --nth=2,3,4 --tabstop=4 --no-multi \
+  --read0 --ansi --highlight-line --gap 1 \
+  --delimiter='\t' --with-nth=2.. --nth=2.. --no-multi \
   --prompt='agent> ' \
   --header='enter: jump to agent · ctrl-r: refresh · esc: close' \
   --bind "ctrl-r:reload($list_cmd)" \
-  --preview "bash '$plugin_root/scripts/preview.sh' {1}" \
-  --preview-window='down,55%,wrap')"
+  --preview "python3 '$plugin_root/scripts/preview.py' {1}" \
+  --preview-window='down,55%')"
 fzf_status=$?
 set -e
 [ "$fzf_status" -ne 0 ] && exit 0 # esc / ctrl-c / no match
