@@ -1,0 +1,20 @@
+id = "leonho.agent-inbox"
+name = "Agent Inbox"
+version = "0.1.0"
+min_herdr_version = "0.7.4"
+description = "Popup triage list of all agents with their latest recap; Enter jumps to the agent's pane."
+platforms = ["macos", "linux"]
+
+[[actions]]
+id = "open"
+title = "Agent inbox: recap list, jump to agent"
+contexts = ["pane", "workspace"]
+command = ["bash", "scripts/open.sh"]
+
+[[panes]]
+id = "inbox"
+title = "Agent Inbox"
+placement = "popup"
+width = "85%"
+height = "70%"
+command = ["bash", "scripts/inbox.sh"]
