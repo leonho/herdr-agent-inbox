@@ -12,7 +12,13 @@ that agent's pane.
 ## Install
 
 ```sh
-herdr plugin link ~/workspace/herdr-agent-inbox
+herdr plugin install leonho/herdr-agent-inbox
+```
+
+Or from a local checkout:
+
+```sh
+herdr plugin link /path/to/herdr-agent-inbox
 ```
 
 Keybinding (config.toml):
