@@ -31,5 +31,6 @@ fzf_status=$?
 set -e
 [ "$fzf_status" -ne 0 ] && exit 0 # esc / ctrl-c / no match
 
-pane_id="$(cut -f1 <<<"$sel")"
+# multi-line entry: the hidden pane_id field is on the first line only
+pane_id="$(head -n1 <<<"$sel" | cut -f1)"
 [ -n "$pane_id" ] && exec "$herdr" agent focus "$pane_id"
