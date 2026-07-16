@@ -22,8 +22,9 @@ sel="$(eval "$list_cmd" | fzf \
   --read0 --ansi --highlight-line --gap 1 \
   --delimiter='\t' --with-nth=2.. --nth=2.. --no-multi \
   --prompt='agent> ' \
-  --header='enter: jump to agent · ctrl-r: refresh · esc: close' \
+  --header='enter: jump to agent · ctrl-r: refresh · shift-↑/↓: scroll preview · esc: close' \
   --bind "ctrl-r:reload($list_cmd)" \
+  --bind 'shift-up:preview-half-page-up,shift-down:preview-half-page-down' \
   --preview "python3 '$plugin_root/scripts/preview.py' {1}" \
   --preview-window='down,55%')"
 fzf_status=$?
