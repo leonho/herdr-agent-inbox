@@ -20,7 +20,7 @@ fi
 set +e
 sel="$(eval "$list_cmd" | fzf \
   --read0 --ansi --highlight-line --gap 1 \
-  --delimiter='\t' --with-nth=2.. --nth=2.. --no-multi \
+  --delimiter='\t' --with-nth=2.. --no-multi \
   --prompt='agent> ' \
   --header='enter: jump to agent · ctrl-r: refresh · shift-↑/↓: scroll preview · esc: close' \
   --bind "ctrl-r:reload($list_cmd)" \
