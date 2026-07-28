@@ -5,9 +5,10 @@ through panes to figure out who needs you.
 
 Each row shows the agent's status, workspace, and its latest Claude Code
 `※ recap:` line (or the question it's blocked on). Rows are sorted by
-what needs a decision first: **blocked → done → idle → working**. The preview
-shows the full recap plus recent output. Press **Enter** to jump straight to
-that agent's pane.
+lifecycle state: **idle → running → completed → blocked**. The most advanced
+state is highlighted initially: blocked first, then completed, then running,
+then idle. The preview shows the full recap plus recent output. Press **Enter**
+to jump straight to that agent's pane.
 
 ## Install
 

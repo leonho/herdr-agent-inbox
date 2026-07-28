@@ -10,7 +10,7 @@ import sys
 import textwrap
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from agents import extract_recap, herdr_json  # noqa: E402
+from agents import extract_recap, read_agent_output  # noqa: E402
 
 DIM = "\x1b[2m"
 RESET = "\x1b[0m"
@@ -65,8 +65,7 @@ def main():
     pane_id = sys.argv[1]
     width = int(os.environ.get("FZF_PREVIEW_COLUMNS") or 100)
 
-    d = herdr_json("agent", "read", pane_id, "--source", "recent", "--lines", "150")
-    text = d["result"]["read"]["text"]
+    text = read_agent_output(pane_id)
 
     recap = extract_recap(text)
     if recap:

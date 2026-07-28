@@ -17,13 +17,19 @@ from concurrent.futures import ThreadPoolExecutor
 HERDR = os.environ.get("HERDR_BIN_PATH", "herdr")
 SELF_PANE = os.environ.get("HERDR_PANE_ID", "")
 
-STATUS_ORDER = {"blocked": 0, "done": 1, "idle": 2, "unknown": 3, "working": 4}
+# fzf's default layout renders the first input row at the bottom and selects it.
+# Keep this in reverse display order so the UI reads:
+# idle → running → completed → blocked.
+#
+# This also makes the most advanced state the initial selection, with precedence
+# blocked → completed → running → idle.
+STATUS_ORDER = {"blocked": 0, "done": 1, "working": 2, "idle": 3, "unknown": 4}
 STATUS_LABEL = {
     "blocked": "⛔ blocked",
-    "done": "✅ done",
+    "done": "✅ completed",
     "idle": "✳ idle",
     "unknown": "? unknown",
-    "working": "⚙ working",
+    "working": "⚙ running",
 }
 STATUS_COLOR = {
     "blocked": "\x1b[1;31m",  # bold red
@@ -49,10 +55,27 @@ def herdr_json(*args):
     return json.loads(out.stdout)
 
 
+def read_agent_output(pane_id, lines=150):
+    """Read pane text from current and legacy herdr CLI response formats."""
+    args = ("agent", "read", pane_id, "--source", "recent", "--lines", str(lines))
+    out = subprocess.run(
+        [HERDR, *args], capture_output=True, text=True, timeout=10
+    )
+    if out.returncode != 0:
+        raise RuntimeError(f"herdr {' '.join(args)}: {out.stderr.strip()}")
+
+    # Current herdr versions print the terminal snapshot directly. Older
+    # versions returned the same text inside the standard JSON envelope.
+    try:
+        response = json.loads(out.stdout)
+        return response["result"]["read"]["text"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return out.stdout
+
+
 def read_recent(pane_id, lines=150):
     try:
-        d = herdr_json("agent", "read", pane_id, "--source", "recent", "--lines", str(lines))
-        return d["result"]["read"]["text"]
+        return read_agent_output(pane_id, lines)
     except Exception:
         return ""
 
