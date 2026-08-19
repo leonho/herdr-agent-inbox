@@ -20,7 +20,10 @@ fi
 # Keep the full screen available for the list on narrow/mobile clients. Use
 # tput here because this script runs inside the newly opened popup pane, whose
 # width can differ from the pane that launched it.
-mobile_threshold="${AGENT_INBOX_MOBILE_THRESHOLD:-64}"
+# A phone terminal can still be wider than Herdr's 64-column mobile-layout
+# cutoff (80 columns is common), so use a separate, more generous threshold
+# for deciding whether a split preview is useful.
+preview_min_width="${AGENT_INBOX_PREVIEW_MIN_WIDTH:-100}"
 terminal_width="$(tput cols 2>/dev/null || true)"
 if [[ ! "$terminal_width" =~ ^[0-9]+$ ]]; then
   terminal_width="${COLUMNS:-0}"
@@ -32,7 +35,7 @@ fzf_args=(
   --prompt='agent> '
   --bind "ctrl-r:reload($list_cmd)"
 )
-if [ "$terminal_width" -gt "$mobile_threshold" ]; then
+if [ "$terminal_width" -ge "$preview_min_width" ]; then
   fzf_args+=(
     --header='enter: jump to agent · ctrl-r: refresh · shift-↑/↓: scroll preview · esc: close'
     --bind='shift-up:preview-half-page-up,shift-down:preview-half-page-down'
