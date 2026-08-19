@@ -46,8 +46,9 @@ command = "leonho.agent-inbox.open"
 
 ## How it works
 
-`scripts/agents.py` calls `herdr agent list` and `herdr agent read --source
-recent` per agent, extracts the last `※ recap:` block (Claude Code prints
-one when a turn ends) or the blocked prompt question, and emits triage-sorted
-TSV. `scripts/inbox.sh` renders it with fzf in a herdr popup pane and calls
+`scripts/agents.py` calls `herdr agent list` and reads each agent's visible
+snapshot, extracts the last `※ recap:` block (Claude Code prints one when a
+turn ends) or the blocked prompt question, and emits triage-sorted TSV. The
+selected agent's preview loads deeper recent history separately.
+`scripts/inbox.sh` renders the list with fzf in a herdr popup pane and calls
 `herdr agent focus` on selection.

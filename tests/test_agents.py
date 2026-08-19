@@ -22,6 +22,30 @@ class ReadAgentOutputTests(unittest.TestCase):
         )
 
     @patch("agents.subprocess.run")
+    def test_supports_visible_snapshot_source(self, run):
+        run.return_value = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="visible output\n", stderr=""
+        )
+
+        self.assertEqual(
+            agents.read_agent_output("workspace:pane", source="visible"),
+            "visible output\n",
+        )
+        self.assertEqual(
+            run.call_args.args[0],
+            [
+                agents.HERDR,
+                "agent",
+                "read",
+                "workspace:pane",
+                "--source",
+                "visible",
+                "--lines",
+                "150",
+            ],
+        )
+
+    @patch("agents.subprocess.run")
     def test_reads_legacy_json_response(self, run):
         stdout = json.dumps(
             {"result": {"read": {"text": "⏺ Legacy response\n"}}}

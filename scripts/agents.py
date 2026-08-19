@@ -55,9 +55,9 @@ def herdr_json(*args):
     return json.loads(out.stdout)
 
 
-def read_agent_output(pane_id, lines=150):
+def read_agent_output(pane_id, lines=150, source="recent"):
     """Read pane text from current and legacy herdr CLI response formats."""
-    args = ("agent", "read", pane_id, "--source", "recent", "--lines", str(lines))
+    args = ("agent", "read", pane_id, "--source", source, "--lines", str(lines))
     out = subprocess.run(
         [HERDR, *args], capture_output=True, text=True, timeout=10
     )
@@ -73,9 +73,16 @@ def read_agent_output(pane_id, lines=150):
         return out.stdout
 
 
-def read_recent(pane_id, lines=150):
+def read_list_snapshot(pane_id, lines=150):
+    """Read only the visible snapshot used to build the initial list.
+
+    Asking `herdr agent read --source recent` for more than the visible screen can
+    scroll an idle alternate-screen terminal and takes about five seconds. The
+    recap and blocked prompt we need here are at the bottom of the visible pane.
+    The preview still requests recent history separately after fzf is open.
+    """
     try:
-        return read_agent_output(pane_id, lines)
+        return read_agent_output(pane_id, lines, source="visible")
     except Exception:
         return ""
 
@@ -133,7 +140,7 @@ def main():
     ws_label = {w["workspace_id"]: (w.get("label") or w["workspace_id"]) for w in workspaces}
 
     with ThreadPoolExecutor(max_workers=8) as pool:
-        texts = list(pool.map(lambda a: read_recent(a["pane_id"]), agents))
+        texts = list(pool.map(lambda a: read_list_snapshot(a["pane_id"]), agents))
 
     rows = []
     for agent, text in zip(agents, texts):
