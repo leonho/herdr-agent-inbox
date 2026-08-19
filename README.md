@@ -7,7 +7,8 @@ Each row shows the agent's status, workspace, and its latest Claude Code
 `※ recap:` line (or the question it's blocked on). Rows are sorted by
 lifecycle state: **idle → running → completed → blocked**. The most advanced
 state is highlighted initially: blocked first, then completed, then running,
-then idle. The preview shows the full recap plus recent output. Press **Enter**
+then idle. On desktop, the preview shows the full recap plus recent output; it
+is hidden on narrow/mobile clients to leave room for the list. Press **Enter**
 to jump straight to that agent's pane.
 
 ## Install

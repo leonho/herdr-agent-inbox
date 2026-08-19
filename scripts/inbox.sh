@@ -17,16 +17,34 @@ if ! command -v fzf >/dev/null 2>&1; then
   exit 1
 fi
 
+# Keep the full screen available for the list on narrow/mobile clients. Use
+# tput here because this script runs inside the newly opened popup pane, whose
+# width can differ from the pane that launched it.
+mobile_threshold="${AGENT_INBOX_MOBILE_THRESHOLD:-64}"
+terminal_width="$(tput cols 2>/dev/null || true)"
+if [[ ! "$terminal_width" =~ ^[0-9]+$ ]]; then
+  terminal_width="${COLUMNS:-0}"
+fi
+
+fzf_args=(
+  --read0 --ansi --highlight-line --gap 1
+  --delimiter='\t' --with-nth=2.. --no-multi
+  --prompt='agent> '
+  --bind "ctrl-r:reload($list_cmd)"
+)
+if [ "$terminal_width" -gt "$mobile_threshold" ]; then
+  fzf_args+=(
+    --header='enter: jump to agent · ctrl-r: refresh · shift-↑/↓: scroll preview · esc: close'
+    --bind='shift-up:preview-half-page-up,shift-down:preview-half-page-down'
+    --preview "python3 '$plugin_root/scripts/preview.py' {1}"
+    --preview-window='down,55%'
+  )
+else
+  fzf_args+=(--header='enter: jump to agent · ctrl-r: refresh · esc: close')
+fi
+
 set +e
-sel="$(eval "$list_cmd" | fzf \
-  --read0 --ansi --highlight-line --gap 1 \
-  --delimiter='\t' --with-nth=2.. --no-multi \
-  --prompt='agent> ' \
-  --header='enter: jump to agent · ctrl-r: refresh · shift-↑/↓: scroll preview · esc: close' \
-  --bind "ctrl-r:reload($list_cmd)" \
-  --bind 'shift-up:preview-half-page-up,shift-down:preview-half-page-down' \
-  --preview "python3 '$plugin_root/scripts/preview.py' {1}" \
-  --preview-window='down,55%')"
+sel="$(eval "$list_cmd" | fzf "${fzf_args[@]}")"
 fzf_status=$?
 set -e
 [ "$fzf_status" -ne 0 ] && exit 0 # esc / ctrl-c / no match
